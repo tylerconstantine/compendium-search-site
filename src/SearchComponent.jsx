@@ -1,3 +1,5 @@
+console.log("Search URL:", url);
+console.log("API key starts with:", key?.slice(0, 5));
 import React, { useState } from 'react';
 
 const SearchComponent = () => {
