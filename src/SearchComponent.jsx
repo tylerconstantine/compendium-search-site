@@ -1,5 +1,3 @@
-console.log("Search URL:", url);
-console.log("API key starts with:", key?.slice(0, 5));
 import React, { useState } from 'react';
 
 const SearchComponent = () => {
@@ -19,6 +17,10 @@ const SearchComponent = () => {
 
       const url = `${endpoint}/indexes/${index}/docs?api-version=2023-07-01-Preview&search=${encodeURIComponent(query)}`;
 
+      // Debug logging
+      console.log("🔎 Search URL:", url);
+      console.log("🔐 API key starts with:", key?.slice(0, 5) || '[undefined]');
+
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
@@ -26,12 +28,14 @@ const SearchComponent = () => {
         }
       });
 
-      if (!response.ok) throw new Error(`Search failed: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Search failed with status ${response.status}`);
+      }
 
       const data = await response.json();
       setResults(data.value || []);
     } catch (err) {
-      console.error(err);
+      console.error("❌ Fetch error:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -39,24 +43,28 @@ const SearchComponent = () => {
   };
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h2>Search Documents</h2>
-      <input
-        type="text"
-        value={query}
-        placeholder="Enter search query"
-        onChange={(e) => setQuery(e.target.value)}
-        style={{ width: '300px', padding: '0.5rem', marginRight: '1rem' }}
-      />
-      <button onClick={searchAzure} disabled={loading}>
-        {loading ? 'Searching...' : 'Search'}
-      </button>
+    <div style={{ padding: '2rem' }}>
+      <h2>Search Azure AI Index</h2>
+      <div style={{ marginBottom: '1rem' }}>
+        <input
+          type="text"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Type a keyword, or use * to show all"
+          style={{ width: '300px', padding: '0.5rem' }}
+        />
+        <button onClick={searchAzure} disabled={loading} style={{ marginLeft: '0.5rem', padding: '0.5rem 1rem' }}>
+          {loading ? 'Searching...' : 'Search'}
+        </button>
+      </div>
 
       {error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
       <ul>
-        {results.map((doc, i) => (
-          <li key={i}><pre>{JSON.stringify(doc, null, 2)}</pre></li>
+        {results.map((doc, index) => (
+          <li key={index} style={{ marginBottom: '1rem', fontFamily: 'monospace' }}>
+            <pre>{JSON.stringify(doc, null, 2)}</pre>
+          </li>
         ))}
       </ul>
     </div>
