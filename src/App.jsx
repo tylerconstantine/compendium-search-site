@@ -1,3 +1,4 @@
+<h1>Compendium Document Search 🔍</h1>
 import React from 'react';
 import SearchComponent from './SearchComponent'; // Assumes it's in src/
 
